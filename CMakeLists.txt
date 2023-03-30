@@ -8,6 +8,7 @@ option(ASAN "Address Sanitizer" OFF)
 
 cmake_policy(SET CMP0048 NEW) # project() command manages VERSION variables
 set(CMAKE_CXX_STANDARD 17)
+set(MULTI_TERMINAL 0)
 CONFIGURE_FILE("src/config.h.cmake" "include/cdd/config.h")
 
 if(CMAKE_TOOLCHAIN_FILE)
