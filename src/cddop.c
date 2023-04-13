@@ -1245,18 +1245,13 @@ static ddNode* add_bound(ddNode* c, int32_t level, raw_t low, raw_t up)
 
 int32_t cdd_equiv(ddNode* c, ddNode* d)
 {
-    ddNode* tmp1;
-    ddNode* tmp2;
+    ddNode* tmp;
 
-    tmp1 = cdd_xor(c, d);
-    cdd_ref(tmp1);
+    tmp = cdd_xor(c, d);
+    cdd_ref(tmp);
 
-    tmp2 = cdd_reduce(tmp1);
-    cdd_ref(tmp2);
-
-    cdd_rec_deref(tmp1);
-    cdd_rec_deref(tmp2);
-    return tmp2 == cddfalse;
+    cdd_rec_deref(tmp);
+    return IS_FALSE(tmp);
 }
 
 static ddNode* cdd_reduce2_rec(ddNode* node)
