@@ -131,7 +131,7 @@ int32_t cdd_is_extra_terminal(ddNode*);
  * @return 1 if the node is a terminal true or false.
  * This is useful for the case of multi-terminals.
  */
-#define cdd_is_tfterminal(node) (cdd_rglr(node) == cddfalse)
+#define cdd_is_tfterminal(node) (true)
 
 /**
  * Decrements the reference counter on \a node. If the counter hits
