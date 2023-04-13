@@ -1383,13 +1383,18 @@ static ddNode* cdd_tarjan_reduce_rec(ddNode* node, struct tarjan* graph)
     ddNode* n;
     LevelInfo* info;
 
+    fprintf(stdout, "1");
+
     /* Termination conditions */
     if (cdd_isterminal(node))
+        fprintf(stdout, "2");
         return node;
 
+    fprintf(stdout, "3");
     info = cdd_info(node);
     switch (info->type) {
     case TYPE_BDD:
+        fprintf(stdout, "4");
         n = cdd_tarjan_reduce_rec(cdd_neg_cond(bdd_node(node)->low, cdd_mask(node)), graph);
         cdd_ref(n);
         m = cdd_make_bdd_node(cdd_rglr(node)->level, n,
@@ -1398,6 +1403,7 @@ static ddNode* cdd_tarjan_reduce_rec(ddNode* node, struct tarjan* graph)
         break;
 
     case TYPE_CDD:
+        fprintf(stdout, "5");
         /* Find first consistent child. Lower bounds do not matter
          * here since we know any edge to the left of the current one
          * is inconsistent.
@@ -1416,11 +1422,13 @@ static ddNode* cdd_tarjan_reduce_rec(ddNode* node, struct tarjan* graph)
                  * has no effect at all. Reduce the last child and
                  * return it directly.
                  */
+                fprintf(stdout, "6");
                 return cdd_tarjan_reduce_rec(cdd_it_child(it), graph);
             }
             cdd_tarjan_push(graph, info->clock1, info->clock2, bnd);
         }
 
+        fprintf(stdout, "7");
         /* Do recursion for the first consistent child we found above.
          */
         m = cdd_tarjan_reduce_rec(cdd_it_child(it), graph);
@@ -1474,6 +1482,7 @@ static ddNode* cdd_tarjan_reduce_rec(ddNode* node, struct tarjan* graph)
         break;
     default: m = NULL;
     }
+    fprintf(stdout, "8");
     return m;
 }
 
