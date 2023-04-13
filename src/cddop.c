@@ -176,13 +176,13 @@ static ddNode* cdd_apply_rec(ddNode* l, ddNode* r)
     /* Termination conditons */
     switch (applyop) {
     case cddop_and:
-        if (l == r || r == cddtrue) {
+        if (l == r || IS_TRUE(r)) {
             return l;
         }
-        if (l == cddfalse || r == cddfalse || l == cdd_neg(r)) {
+        if (IS_FALSE(l) || IS_FALSE(r) || l == cdd_neg(r)) {
             return cddfalse;
         }
-        if (l == cddtrue) {
+        if (IS_TRUE(l)) {
             return r;
         }
         break;
@@ -193,16 +193,16 @@ static ddNode* cdd_apply_rec(ddNode* l, ddNode* r)
         if (l == cdd_neg(r)) {
             return cddtrue;
         }
-        if (l == cddfalse) {
+        if (IS_FALSE(l)) {
             return r;
         }
-        if (r == cddfalse) {
+        if (IS_FALSE(r)) {
             return l;
         }
-        if (l == cddtrue) {
+        if (IS_TRUE(l)) {
             return cdd_neg(r);
         }
-        if (r == cddtrue) {
+        if (IS_TRUE(r)) {
             return cdd_neg(l);
         }
         break;
@@ -368,9 +368,9 @@ static int32_t cdd_contains_rec(ddNode* node, raw_t* d, uint32_t dim)
     LevelInfo* info;
 
     /* Check termination conditions */
-    if (node == cddtrue)
+    if (IS_TRUE(node))
         return 1;
-    if (node == cddfalse)
+    if (IS_FALSE(node))
         return 0;
 
 #ifdef MULTI_TERMINAL
@@ -495,7 +495,7 @@ static DBM cdd2dbm(ddNode* node)
 
     while (!cdd_isterminal(node)) {
         cdd_it_init(it, node);
-        while (cdd_it_child(it) == cddfalse) {
+        while (IS_FALSE(cdd_it_child(it))) {
             cdd_it_next(it);
         }
 
@@ -539,9 +539,9 @@ static ddNode* cdd_exist_rec(ddNode* node, int32_t* levels, ddNode* c)
     ddNode* tmp2;
     ddNode* tmp3;
 
-    if (node == cddfalse)
+    if (IS_FALSE(node))
         return cddfalse;
-    if (node == cddtrue)
+    if (IS_TRUE(node))
         return translate(c, levels);
 
 #ifdef MULTI_TERMINAL
@@ -1245,13 +1245,18 @@ static ddNode* add_bound(ddNode* c, int32_t level, raw_t low, raw_t up)
 
 int32_t cdd_equiv(ddNode* c, ddNode* d)
 {
-    ddNode* tmp;
+    ddNode* tmp1;
+    ddNode* tmp2;
 
-    tmp = cdd_xor(c, d);
-    cdd_ref(tmp);
+    tmp1 = cdd_xor(c, d);
+    cdd_ref(tmp1);
 
-    cdd_rec_deref(tmp);
-    return IS_FALSE(tmp);
+    tmp2 = cdd_reduce(tmp1);
+    cdd_ref(tmp2);
+
+    cdd_rec_deref(tmp1);
+    cdd_rec_deref(tmp2);
+    return IS_FALSE(tmp2);
 }
 
 static ddNode* cdd_reduce2_rec(ddNode* node)
@@ -1520,13 +1525,13 @@ static ddNode* cdd_apply_reduce_rec(ddNode* l, ddNode* r, struct tarjan* graph)
      */
     switch (applyop) {
     case cddop_and:
-        if (l == r || r == cddtrue) {
+        if (l == r || IS_TRUE(r)) {
             return cdd_tarjan_reduce_rec(l, graph);
         }
-        if (l == cddfalse || r == cddfalse || l == cdd_neg(r)) {
+        if (IS_FALSE(l) || IS_FALSE(r) || l == cdd_neg(r)) {
             return cddfalse;
         }
-        if (l == cddtrue) {
+        if (IS_TRUE(l)) {
             return cdd_tarjan_reduce_rec(r, graph);
         }
 #ifdef MULTI_TERMINAL
@@ -1545,16 +1550,16 @@ static ddNode* cdd_apply_reduce_rec(ddNode* l, ddNode* r, struct tarjan* graph)
         if (l == cdd_neg(r)) {
             return cddtrue;
         }
-        if (l == cddfalse) {
+        if (IS_FALSE(l)) {
             return cdd_tarjan_reduce_rec(r, graph);
         }
-        if (r == cddfalse) {
+        if (IS_FALSE(r)) {
             return cdd_tarjan_reduce_rec(l, graph);
         }
-        if (l == cddtrue) {
+        if (IS_TRUE(l)) {
             return cdd_tarjan_reduce_rec(cdd_neg(r), graph);
         }
-        if (r == cddtrue) {
+        if (IS_TRUE(r)) {
             return cdd_tarjan_reduce_rec(cdd_neg(l), graph);
         }
         break;
