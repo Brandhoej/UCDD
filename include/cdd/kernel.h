@@ -124,7 +124,7 @@ int32_t cdd_isterminal(ddNode*);
 int32_t cdd_is_extra_terminal(ddNode*);
 #else
 /** Returns true if \a node is a terminal */
-#define cdd_isterminal(node) (cdd_rglr(node) == cddfalse)
+#define cdd_isterminal(node) (cdd_is_tfterminal(node))
 #endif
 
 /**
